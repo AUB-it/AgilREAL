@@ -43,15 +43,36 @@ public sealed class UserControllerTests
     [TestMethod]
     public void Username_Already_Exists_Returns_400_Bad_Request()
     {
+        // Arrange
         var mock = new Mock<IUserRepository>();
         mock.Setup(r => r.Register(It.IsAny<User>()))
             .Returns(false);
         var controller = new UsersController(mock.Object);
         
+        // Act
         var result = controller.RegisterUser(new User()) as  BadRequestResult;
         
+        // Assert
         Assert.IsInstanceOfType<BadRequestResult>(result);
         mock.Verify(r => r.Register(It.IsAny<User>()), Times.Once);
+    }
+    
+    [TestMethod]
+    public void NULL_DTO_Returns_400_Bad_Request()
+    {
+        // Arrange
+        var mock = new Mock<IUserRepository>();
+        mock.Setup(r => r.Register(null))
+            .Returns(false);
+        mock.Setup(r => r.Login(null, null))
+            .Returns((User?)null);
+        
+        // Act
+        var controller = new UsersController(mock.Object);
+        
+        // Assert
+        var result = controller.RegisterUser(null) as BadRequestResult;
+        Assert.IsInstanceOfType<BadRequestResult>(result);
     }
     
 }

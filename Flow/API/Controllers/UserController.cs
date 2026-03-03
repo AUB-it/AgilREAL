@@ -20,6 +20,9 @@ public class UsersController : ControllerBase
     [Route("api/register")]
     public IActionResult RegisterUser(User user)
     {
+        if (user == null)
+            return BadRequest();
+        
         var repoResult = _userRepository.Register(user);
         if (!repoResult)
             return BadRequest();
@@ -31,6 +34,9 @@ public class UsersController : ControllerBase
     [Route("users/login")]
     public IActionResult Login(UserLogin loginRequest)
     {
+        if (loginRequest == null || string.IsNullOrEmpty(loginRequest.username) || string.IsNullOrEmpty(loginRequest.password))
+            return BadRequest();
+        
         User? userExist = _userRepository.Login(loginRequest.username, loginRequest.password);
         if (userExist == null)
             return Unauthorized();

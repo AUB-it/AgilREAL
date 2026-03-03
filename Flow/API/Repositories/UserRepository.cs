@@ -37,11 +37,15 @@ public class UserRepository : IUserRepository
 
     public User? Login(string username, string password)
     {
+        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            return null;
         return users.FirstOrDefault(x => x.Name == username && x.Password == password);
     }
 
     public bool Register(User user)
     {
+        if (user == null)
+            return false;
         try
         {
             users.Add(user);
