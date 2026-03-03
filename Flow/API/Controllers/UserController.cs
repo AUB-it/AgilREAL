@@ -17,9 +17,12 @@ public class UsersController : ControllerBase
     }
     
     [HttpPost]
+    [Route("api/register")]
     public IActionResult RegisterUser(User user)
     {
-        _userRepository.Register(user);
+        var repoResult = _userRepository.Register(user);
+        if (!repoResult)
+            return BadRequest();
         Console.WriteLine("User Registered");
         return Ok(user);
     }
