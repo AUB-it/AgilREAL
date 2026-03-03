@@ -1,8 +1,10 @@
 ﻿using API.Controllers;
 using API.Models;
 using API.Repositories;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Range = Moq.Range;
 
 namespace API.Tests;
 
@@ -37,4 +39,19 @@ public sealed class UserControllerTests
         mock.Verify(r => r.Register(user), Times.Once);
         
     }
+    
+    [TestMethod]
+    public void Username_Already_Exists_Returns_400_Bad_Request()
+    {
+        var mock = new Mock<IUserRepository>();
+        mock.Setup(r => r.Register(It.IsAny<User>()))
+            .Returns(false);
+        var controller = new UsersController(mock.Object);
+        
+        var result = controller.RegisterUser(new User()) as  BadRequestResult;
+        
+        Assert.IsInstanceOfType<BadRequestResult>(result);
+        mock.Verify(r => r.Register(It.IsAny<User>()), Times.Once);
+    }
+    
 }
