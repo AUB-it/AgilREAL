@@ -16,10 +16,12 @@ public class UsersController
         _userRepository = userRepository;
     }
     
-    [HttpPost(Name = "RegisterUser")]
-    public  User RegisterUser(User user)
+    [HttpPost]
+    public IResult RegisterUser(User user)
     {
-        throw new InvalidOperationException();
+        _userRepository.Register(user);
+        Console.WriteLine("User Registered");
+        return Results.Created($"api/users/{user.Id}", user);
     }
 
     [HttpPost]
