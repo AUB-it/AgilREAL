@@ -40,9 +40,17 @@ public class UserRepository : IUserRepository
         return users.FirstOrDefault(x => x.Name == username && x.Password == password);
     }
 
-    public IResult Register(User user)
+    public bool Register(User user)
     {
-        users.Add(user);
-        return Results.Created($"api/users/register/{user.Id}", user);
+        try
+        {
+            users.Add(user);
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
     }
 }

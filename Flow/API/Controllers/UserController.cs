@@ -6,7 +6,7 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UsersController
+public class UsersController : ControllerBase
 {
     
     private readonly IUserRepository _userRepository;
@@ -17,21 +17,21 @@ public class UsersController
     }
     
     [HttpPost]
-    public IResult RegisterUser(User user)
+    public IActionResult RegisterUser(User user)
     {
         _userRepository.Register(user);
         Console.WriteLine("User Registered");
-        return Results.Created($"api/users/{user.Id}", user);
+        return Ok(user);
     }
 
     [HttpPost]
     [Route("users/login")]
-    public IResult Login(UserLogin loginRequest)
+    public IActionResult Login(UserLogin loginRequest)
     {
         User? userExist = _userRepository.Login(loginRequest.username, loginRequest.password);
         if (userExist == null)
-            return Results.Unauthorized();
-        return Results.Ok(userExist);
+            return Unauthorized();
+        return Ok(userExist);
     }
 }
 
