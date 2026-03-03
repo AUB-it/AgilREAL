@@ -53,4 +53,5 @@ public sealed class UserControllerTests
         Assert.IsInstanceOfType<BadRequestResult>(result);
         mock.Verify(r => r.Register(It.IsAny<User>()), Times.Once);
     }
+    
 }
