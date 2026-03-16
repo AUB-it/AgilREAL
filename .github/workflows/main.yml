@@ -22,10 +22,8 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
 
-    - name: Debug - find sln files
-      run: Get-ChildItem -Recurse -Filter *.sln | Select-Object FullName
-      shell: pwsh
+    - name: Build
+      run: dotnet build Flow/Flow.slnx --configuration Release
 
     - name: Execute unit tests
-      run: dotnet test Flow/Flow.sln
-
+      run: dotnet test Flow/Flow.slnx --configuration Release --no-build
