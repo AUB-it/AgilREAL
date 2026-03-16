@@ -45,16 +45,22 @@ public sealed class UserControllerTests
     {
         // Arrange
         var mock = new Mock<IUserRepository>();
-        mock.Setup(r => r.Register(It.IsAny<User>()))
-            .Returns(false);
         var controller = new UsersController(mock.Object);
-        
+        var user = new User
+        {
+            Name = "Umut",
+            Password = "Umut123",
+            Email = "umut@hjemmeværnet.dk"
+        };
+
+        mock.Setup(r => r.Register(user))
+            .Returns(false);
         // Act
-        var result = controller.RegisterUser(new User()) as  BadRequestResult;
+        var result = controller.RegisterUser(user) as  BadRequestResult;
         
         // Assert
         Assert.IsInstanceOfType<BadRequestResult>(result);
-        mock.Verify(r => r.Register(It.IsAny<User>()), Times.Once);
+        mock.Verify(r => r.Register(user), Times.Once);
     }
     
     [TestMethod]
@@ -74,15 +80,13 @@ public sealed class UserControllerTests
         var result = controller.RegisterUser(null) as BadRequestResult;
         Assert.IsInstanceOfType<BadRequestResult>(result);
     }
-
+    
     [TestMethod]
     public void NoUsername_Returns_400_Bad_Request()
     {
         // Arrange
         var mock = new Mock<IUserRepository>();
         // Repository returnerer false hvis username er tom eller null
-        mock.Setup(r => r.Register(It.Is<User>(u => u != null && string.IsNullOrEmpty(u.Name))))
-            .Returns(false);
 
         var controller = new UsersController(mock.Object);
 
@@ -98,6 +102,28 @@ public sealed class UserControllerTests
         // Assert
         Assert.IsNotNull(result);
         Assert.AreEqual(400, result.StatusCode);
-        mock.Verify(r => r.Register(It.Is<User>(u => u == newUser)), Times.Once);
+        mock.Verify(r => r.Register(It.IsAny<User>()), Times.Never);
+    }
+    [TestMethod]
+    public void NoPassword_Returns_400_Bad_Request()
+    {
+        // Arrange
+        var mock = new Mock<IUserRepository>();
+        var user = new User()
+        {
+            Id = 24,
+            Email = "Umut@hjemmeværnet.dk",
+            Name = "Testcase5navn",
+            Password = null
+        };
+
+        var controller = new UsersController(mock.Object);
+
+        // Act
+        var result = controller.RegisterUser(user) as BadRequestResult;
+
+        // Assert
+        Assert.IsInstanceOfType<BadRequestResult>(result);
+        mock.Verify(r => r.Register(user), Times.Never);
     }
 }
