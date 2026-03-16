@@ -74,5 +74,30 @@ public sealed class UserControllerTests
         var result = controller.RegisterUser(null) as BadRequestResult;
         Assert.IsInstanceOfType<BadRequestResult>(result);
     }
-    
+
+    [TestMethod]
+    public void NoUsername_Returns_400_Bad_Request()
+    {
+        // Arrange
+        var mock = new Mock<IUserRepository>();
+        // Repository returnerer false hvis username er tom eller null
+        mock.Setup(r => r.Register(It.Is<User>(u => u != null && string.IsNullOrEmpty(u.Name))))
+            .Returns(false);
+
+        var controller = new UsersController(mock.Object);
+
+        var newUser = new User
+        {
+            Name = "", // tomt username
+            Password = "somepassword"
+        };
+
+        // Act
+        var result = controller.RegisterUser(newUser) as BadRequestResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual(400, result.StatusCode);
+        mock.Verify(r => r.Register(It.Is<User>(u => u == newUser)), Times.Once);
+    }
 }

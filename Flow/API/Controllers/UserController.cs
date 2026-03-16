@@ -20,7 +20,7 @@ public class UsersController : ControllerBase
     [Route("api/register")]
     public IActionResult RegisterUser(User user)
     {
-        if (user == null)
+        if (user == null || string.IsNullOrEmpty(user.Name) || string.IsNullOrEmpty(user.Password))
             return BadRequest();
         
         var repoResult = _userRepository.Register(user);
