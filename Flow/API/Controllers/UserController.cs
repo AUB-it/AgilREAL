@@ -23,11 +23,23 @@ public class UsersController : ControllerBase
         if (user == null || string.IsNullOrWhiteSpace(user.Name) || string.IsNullOrWhiteSpace(user.Password))
             return BadRequest();
         
-        var repoResult = _userRepository.Register(user);
-        if (!repoResult)
-            return BadRequest();
-        Console.WriteLine("User Registered");
-        return Ok(user);
+        try 
+        {
+            // 2. Forsøg at registrere brugeren via repository
+            var repoResult = _userRepository.Register(user);
+            
+            // Hvis navnet allerede findes (repo returnerer false)
+            if (!repoResult)
+                return BadRequest();
+                
+            return Ok(user);
+        }
+        catch (Exception ex)
+        {
+            // TEST 7: Dette sikrer at vi returnerer 500 hvis databasen fejler i stedet for at crashe
+            Console.WriteLine($"Fejl ved registrering: {ex.Message}");
+            return StatusCode(500, "Internal server error");
+        }
     }
 
     [HttpPost]

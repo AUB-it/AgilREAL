@@ -188,4 +188,26 @@ public sealed class UserControllerTests
         Assert.AreEqual(400, result.StatusCode);
         mock.Verify(r => r.Register(It.IsAny<User>()), Times.Never);
     }
+    
+    // TEST 7: Repository kaster en fejl under oprettelse
+    [TestMethod]
+    public void RegisterUser_Returns_500_When_Repository_Throws_Exception()
+    {
+        // Arrange
+        var mock = new Mock<IUserRepository>();
+        var user = new User { Name = "John Doe", Password = "password123", Email = "john@doe.com" };
+        
+        mock.Setup(repo => repo.Register(It.IsAny<User>()))
+            .Throws(new System.Exception("Critical Database Failure"));
+
+        var controller = new UsersController(mock.Object);
+
+        // Act
+        var result = controller.RegisterUser(user) as ObjectResult;
+
+        // Assert
+        Assert.IsNotNull(result, "Controlleren fangede ikke exceptionen. Husk try-catch!");
+        Assert.AreEqual(500, result.StatusCode);
+    }
+
 }
