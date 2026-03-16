@@ -126,7 +126,7 @@ public sealed class UserControllerTests
         Assert.IsInstanceOfType<BadRequestResult>(result);
         mock.Verify(r => r.Register(user), Times.Never);
     }
-
+    
     [TestMethod]
     public void Login_WrongPasswordOrUserNotFound_Returns_401_Unauthorized()
     {
@@ -147,5 +147,27 @@ public sealed class UserControllerTests
         Assert.AreEqual(401, result.StatusCode);
         
         mock.Verify(r => r.Login("existingUser", "wrongPassword"));
+    }
+    [TestMethod]
+    public void WhitespaceUserName_Returns_400_Bad_Request()
+    {
+        // Arrange
+        var mock = new Mock<IUserRepository>();
+        var controller = new UsersController(mock.Object);
+
+        var newUser = new User
+        {
+            Name = "   ",
+            Password = "somepassword",
+            Email = "test@test.dk"
+        };
+
+        // Act
+        var result = controller.RegisterUser(newUser) as BadRequestResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual(400, result.StatusCode);
+        mock.Verify(r => r.Register(It.IsAny<User>()), Times.Never);
     }
 }
