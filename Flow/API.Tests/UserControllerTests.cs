@@ -209,5 +209,40 @@ public sealed class UserControllerTests
         Assert.IsNotNull(result, "Controlleren fangede ikke exceptionen. Husk try-catch!");
         Assert.AreEqual(500, result.StatusCode);
     }
+    
+    // TEST 8: Login med korrekte oplysninger
+    [TestMethod]
+    public void Login_Returns_Ok_When_Credentials_Are_Valid()
+    {
+        // Arrange
+        var mock = new Mock<IUserRepository>();
+        var validUser = new User { Name = "John Doe", Password = "password" };
+        mock.Setup(repo => repo.Login("John Doe", "password")).Returns(validUser);
+        var controller = new UsersController(mock.Object);
+
+        // Act
+        var result = controller.Login(new UserLogin("John Doe", "password"));
+
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+    }
+    
+    // TEST 9: Verificer parametre ved Login
+    [TestMethod]
+    public void Login_Calls_Repository_With_Correct_Parameters()
+    {
+        // Arrange
+        var mock = new Mock<IUserRepository>();
+        string testName = "Jane Smith";
+        string testPass = "jsmith123";
+        mock.Setup(repo => repo.Login(testName, testPass)).Returns(new User { Name = testName });
+        var controller = new UsersController(mock.Object);
+
+        // Act
+        controller.Login(new UserLogin(testName, testPass));
+
+        // Assert
+        mock.Verify(repo => repo.Login(testName, testPass), Times.Once);
+    }
 
 }
